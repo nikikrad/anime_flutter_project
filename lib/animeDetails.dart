@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'apiService.dart';
+
 class AnimeDetails extends StatelessWidget{
-  const AnimeDetails({Key? key}) : super(key: key);
+  final Data data;
+  const AnimeDetails({Key? key, required this.data});
 
   @override
   Widget build(BuildContext context){
