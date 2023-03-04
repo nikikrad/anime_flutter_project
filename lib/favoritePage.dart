@@ -24,7 +24,7 @@ class _FavoritePage extends State<FavoritePage> {
       });
     }
 
-    Widget customSearchBar = const Text('Search Anime');
+    Widget customSearchBar = const Text('Favorite Anime');
     return Scaffold(
       appBar: AppBar(
         title: customSearchBar,

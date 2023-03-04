@@ -13,8 +13,8 @@ class AnimeDetails extends StatelessWidget {
     YoutubePlayerController _controller = YoutubePlayerController(
       initialVideoId: data.attributes?.youtubeVideoId ?? 'z-ENIHctNYM',
       flags: const YoutubePlayerFlags(
-        autoPlay: true,
-        mute: true,
+        autoPlay: false,
+        mute: false,
       ),
     );
     return Scaffold(
@@ -96,7 +96,6 @@ class AnimeDetails extends StatelessWidget {
               ),
               onReady: () {
                 _controller.addListener(() {
-                  print("object");
                 });
               },
             ),
