@@ -1,15 +1,28 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'apiService.dart';
 
-class AnimeDetails extends StatelessWidget {
+const List<Widget> YesOrNo = <Widget>[Text('Yes'), Text('No')];
+class AnimeDetails extends StatefulWidget {
   final Data data;
-
   AnimeDetails({Key? key, required this.data});
 
   @override
+  _AnimeDetails createState() => _AnimeDetails(data);
+}
+
+class _AnimeDetails extends State<AnimeDetails>{
+  final Data data;
+  _AnimeDetails(Data this.data);
+
+
+  @override
   Widget build(BuildContext context) {
+    initFirebase();
+    final List<bool> YesOrNoBool = <bool>[true, true];
+    bool vertical = false;
     YoutubePlayerController _controller = YoutubePlayerController(
       initialVideoId: data.attributes?.youtubeVideoId ?? 'z-ENIHctNYM',
       flags: const YoutubePlayerFlags(
@@ -67,6 +80,47 @@ class AnimeDetails extends StatelessWidget {
               ],
             ),
           ),
+          Expanded(
+              child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const Text('Add to Favorite Anime?'),
+              const SizedBox(height: 5),
+              ToggleButtons(
+                direction: vertical ? Axis.vertical : Axis.horizontal,
+                onPressed: (int index) {
+                  final reference = FirebaseDatabase.instance.reference();
+                  if(index == 0){
+                    reference.child('anime').child(data.id!).set({
+                      'image': data.attributes?.posterImage?.large ??
+                          "https://media.kitsu.io/anime/poster_images/11614/large.jpg",
+                      'name': data.attributes?.titles?.enJp ??
+                          data.attributes?.titles?.jaJp ??
+                          data.attributes?.titles?.en ??
+                          "No data",
+                      'date' : data.attributes?.startDate ?? "No Data",
+                      'rating' : data.attributes?.averageRating ?? "76.32",
+                      'youtube' : data.attributes?.youtubeVideoId ?? "x_xuXowwV98"
+                    });
+                  }else{
+                    reference.child(data.id!).remove();
+                  }
+                },
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                selectedBorderColor: Colors.red[700],
+                selectedColor: Colors.white,
+                fillColor: Colors.red[200],
+                color: Colors.red[400],
+                constraints: const BoxConstraints(
+                  minHeight: 40.0,
+                  minWidth: 80.0,
+                ),
+                isSelected: YesOrNoBool,
+                children: YesOrNo,
+              ),
+            ],
+          )),
           Container(
               padding: const EdgeInsets.only(
                   left: 32.0, top: 15.0, right: 20.0, bottom: 25.0),
@@ -95,11 +149,14 @@ class AnimeDetails extends StatelessWidget {
                 handleColor: Colors.amberAccent,
               ),
               onReady: () {
-                _controller.addListener(() {
-                });
+                _controller.addListener(() {});
               },
             ),
-          )
+          ),
         ]));
+  }
+  initFirebase() async{
+    WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp();
   }
 }
