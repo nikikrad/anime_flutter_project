@@ -3,6 +3,7 @@ import 'package:anime_flutter_project/searchPage.dart';
 import 'package:flutter/material.dart';
 
 import 'animeDetails.dart';
+import 'favoritePage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -52,7 +53,7 @@ class _HomePageState extends State<HomePage> {
               return ListView.builder(
                 itemBuilder: (context, index) {
                   Data data = snapshot.data![index];
-                  return Container(
+                  return Semantics(
                     child: ListTile(
                       title:
                           Text(data.attributes!.titles!.enJp ?? 'Нет данных'),
@@ -60,7 +61,7 @@ class _HomePageState extends State<HomePage> {
                       //         data.attributes!.titles!.enJp!.isNotEmpty
                       //     ? Text(data.attributes!.titles!.enJp!)
                       //     : const Text("Нет данных"),
-                      subtitle: Text(data.attributes!.averageRating ?? '76.32'),
+                      subtitle: (Text(data.attributes!.averageRating ?? '76.32')),
                       // data.attributes!.averageRating! != null &&
                       //           data.attributes!.averageRating!.isNotEmpty
                       //       ? Text(data.attributes!.averageRating!)
@@ -125,7 +126,7 @@ class _HomePageState extends State<HomePage> {
           context, MaterialPageRoute(builder: (context) => const SearchPage()));
     } else if (page == 2) {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => const SearchPage()));
+          context, MaterialPageRoute(builder: (context) => const FavoritePage()));
     } else {
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => const HomePage()));

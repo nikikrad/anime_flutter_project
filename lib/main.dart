@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget{
       title: 'MultInfo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.brown),
-      home: HomePage()
+      home: const HomePage()
     );
   }
 }

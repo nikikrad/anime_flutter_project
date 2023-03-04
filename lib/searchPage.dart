@@ -2,6 +2,7 @@ import 'package:anime_flutter_project/apiService.dart';
 import 'package:flutter/material.dart';
 
 import 'animeDetails.dart';
+import 'favoritePage.dart';
 import 'homePage.dart';
 
 class SearchPage extends StatefulWidget {
@@ -46,19 +47,16 @@ class _SearchPageState extends State<SearchPage> {
               controller: searchController,
               textInputAction: TextInputAction.search,
               onSubmitted: (value) async {
+                const CircularProgressIndicator();
                 var data = await AnimeService().getAnimeByName(value);
-                CircularProgressIndicator();
                 setState(() {
                   futureData = Future.value(data);
                 });
                 print(futureData);
               },
-              onChanged: (value) async {
-
-              },
               decoration: const InputDecoration(
                 border: UnderlineInputBorder(),
-                labelText: 'Enter anime name...',
+                labelText: 'Enter anime name',
               ),
             ),
           ),
@@ -151,7 +149,7 @@ class _SearchPageState extends State<SearchPage> {
           context, MaterialPageRoute(builder: (context) => const SearchPage()));
     } else if (page == 2) {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => const SearchPage()));
+          context, MaterialPageRoute(builder: (context) => const FavoritePage()));
     } else {
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => const HomePage()));
