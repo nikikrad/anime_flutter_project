@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:anime_flutter_project/apiService.dart';
+import 'package:anime_flutter_project/favoriteAnimeDetails.dart';
 import 'package:anime_flutter_project/firebaseData.dart';
 import 'package:anime_flutter_project/searchPage.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -23,7 +24,7 @@ class _FavoritePage extends State<FavoritePage> {
   @override
   void initState() {
     super.initState();
-    initFirebase();
+    futureData = initFirebase();
   }
 
   @override
@@ -47,13 +48,53 @@ class _FavoritePage extends State<FavoritePage> {
       body: RefreshIndicator(
         onRefresh: () async {
           // var data = await reference.child('users').child('1').once();
-          setState(() {});
+          var updateData = initFirebase();
+          setState(() {
+            futureData = Future.value(updateData);
+          });
         },
         child: Center(
             child: FutureBuilder<List<AnimeFirebaseResponse>?>(
-          // future: futureData,
+          future: futureData,
           builder: ((context, AsyncSnapshot snapshot) {
+
             if (snapshot.hasData) {
+              return ListView.builder(
+                itemBuilder: (context, index) {
+                  AnimeFirebaseResponse data = snapshot.data![index];
+                  return Semantics(
+                    child: ListTile(
+                      title:
+                      Text(data.name?? 'Нет данных'),
+                      // data.attributes!.titles!.enJp! != null &&
+                      //         data.attributes!.titles!.enJp!.isNotEmpty
+                      //     ? Text(data.attributes!.titles!.enJp!)
+                      //     : const Text("Нет данных"),
+                      subtitle: (Text(data.rating ?? '76.32')),
+                      // data.attributes!.averageRating! != null &&
+                      //           data.attributes!.averageRating!.isNotEmpty
+                      //       ? Text(data.attributes!.averageRating!)
+                      //       : const Text("Нет данных"),
+                      leading: data.image != null
+                          ? Image.network(
+                        data.image,
+                        fit: BoxFit.cover,
+                        width: 100,
+                        height: 100,
+                      )
+                          : Container(
+                        width: 100,
+                        height: 100,
+                        color: Colors.grey,
+                      ),
+                      trailing: const Icon(Icons.chevron_right_outlined),
+                      onTap: () => openAnimeDetailsPage(context, data),
+                      iconColor: Colors.brown,
+                    ),
+                  );
+                },
+                itemCount: snapshot.data!.length,
+              );
             } else if (snapshot.hasError) {
               return Text('ERROR: ${snapshot.error}');
             }
@@ -87,9 +128,9 @@ class _FavoritePage extends State<FavoritePage> {
         MaterialPageRoute(builder: (context) => AnimeDetails(data: data)));
   }
 
-  openAnimeDetailsPage(context, Data data) {
+  openAnimeDetailsPage(context, AnimeFirebaseResponse data) {
     Navigator.push(context,
-        MaterialPageRoute(builder: (context) => AnimeDetails(data: data)));
+        MaterialPageRoute(builder: (context) => FavoriteAnimeDetails(data: data)));
   }
 
   openBottomNavigationPage(context, int page) {
@@ -105,7 +146,7 @@ class _FavoritePage extends State<FavoritePage> {
     }
   }
 
-  initFirebase() async {
+  Future<List<AnimeFirebaseResponse>> initFirebase() async {
     WidgetsFlutterBinding.ensureInitialized();
     await Firebase.initializeApp();
     final reference = FirebaseDatabase.instance.reference();
@@ -114,13 +155,16 @@ class _FavoritePage extends State<FavoritePage> {
     ids.snapshot.children.forEach((element) {
       tempList.add(
           AnimeFirebaseResponse(
+            id: element.child("id").value.toString(),
             date: element.child("date").value.toString(),
             image: element.child("image").value.toString(),
             name: element.child("name").value.toString(),
             rating: element.child("rating").value.toString(),
             youtube: element.child("youtube").value.toString(),
+            description: element.child("description").value.toString()
           )
       );
     });
+    return tempList;
   }
 }

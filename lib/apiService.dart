@@ -731,7 +731,7 @@ class Links_s {
 
 class AnimeService {
   Future<List<Data>?> getAnime() async {
-    Random rand = new Random();
+    Random rand = Random();
     int page = rand.nextInt(5000) + 4000;
     final response = await http
         .get(Uri.parse("https://kitsu.io/api/edge/anime?page[limit]=20&page[offset]=$page"));

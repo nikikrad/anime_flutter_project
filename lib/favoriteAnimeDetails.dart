@@ -1,3 +1,4 @@
+import 'package:anime_flutter_project/firebaseData.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -6,19 +7,19 @@ import 'apiService.dart';
 
 const List<Widget> YesOrNo = <Widget>[Text('Yes'), Text('No')];
 
-class AnimeDetails extends StatefulWidget {
-  final Data data;
+class FavoriteAnimeDetails extends StatefulWidget {
+  final AnimeFirebaseResponse data;
 
-  AnimeDetails({Key? key, required this.data});
+  FavoriteAnimeDetails({Key? key, required this.data});
 
   @override
-  _AnimeDetails createState() => _AnimeDetails(data);
+  _FavoriteAnimeDetails createState() => _FavoriteAnimeDetails(data);
 }
 
-class _AnimeDetails extends State<AnimeDetails> {
-  final Data data;
+class _FavoriteAnimeDetails extends State<FavoriteAnimeDetails> {
+  final AnimeFirebaseResponse data;
 
-  _AnimeDetails(this.data);
+  _FavoriteAnimeDetails(this.data);
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +27,7 @@ class _AnimeDetails extends State<AnimeDetails> {
     final List<bool> YesOrNoBool = <bool>[true, true];
     bool vertical = false;
     YoutubePlayerController _controller = YoutubePlayerController(
-      initialVideoId: data.attributes?.youtubeVideoId ?? 'z-ENIHctNYM',
+      initialVideoId: data.youtube ?? 'z-ENIHctNYM',
       flags: const YoutubePlayerFlags(
         autoPlay: false,
         mute: false,
@@ -34,13 +35,11 @@ class _AnimeDetails extends State<AnimeDetails> {
     );
     return Scaffold(
         appBar: AppBar(
-          title: Text(data.attributes?.titles?.enJp ??
-              data.attributes?.titles?.jaJp ??
-              data.attributes?.titles?.en ??
+          title: Text(data.name ??
               "No data"),
         ),
         body: ListView(children: <Widget>[
-          Image.network(data.attributes?.posterImage?.large ??
+          Image.network(data.image ??
               "https://media.kitsu.io/anime/poster_images/11614/large.jpg"),
           Container(
             padding: const EdgeInsets.all(32.0),
@@ -57,7 +56,7 @@ class _AnimeDetails extends State<AnimeDetails> {
                       Container(
                         padding: const EdgeInsets.only(bottom: 8.0),
                         child: Text(
-                          "Original Name: ${data.attributes!.titles!.enJp ??
+                          "Original Name: ${data.name ??
                               "No Data"}",
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
@@ -66,7 +65,7 @@ class _AnimeDetails extends State<AnimeDetails> {
                       ),
                       // Code to create the view for release date.
                       Text(
-                        "Release Date: ${data.attributes?.startDate ??
+                        "Release Date: ${data.date ??
                             "No Data"}",
                         style: TextStyle(
                           color: Colors.grey[500],
@@ -80,7 +79,7 @@ class _AnimeDetails extends State<AnimeDetails> {
                   Icons.star,
                   color: Colors.red[500],
                 ),
-                Text(data.attributes?.averageRating ?? "76.32"),
+                Text(data.rating ?? "76.32"),
               ],
             ),
           ),
@@ -98,20 +97,18 @@ class _AnimeDetails extends State<AnimeDetails> {
                       if (index == 0) {
                         reference.child('anime').child(data.id!).set({
                           'id': data.id.toString(),
-                          'image': data.attributes?.posterImage?.large ??
+                          'image': data.image ??
                               "https://media.kitsu.io/anime/poster_images/11614/large.jpg",
-                          'name': data.attributes?.titles?.enJp ??
-                              data.attributes?.titles?.jaJp ??
-                              data.attributes?.titles?.en ??
+                          'name': data.name ??
                               "No data",
-                          'date': data.attributes?.startDate ?? "No Data",
-                          'rating': data.attributes?.averageRating ?? "76.32",
-                          'youtube': data.attributes?.youtubeVideoId ??
+                          'date': data.date ?? "No Data",
+                          'rating': data.rating ?? "76.32",
+                          'youtube': data.youtube ??
                               "x_xuXowwV98",
-                          'description' : data.attributes?.description ?? "No Data"
+                          'description' : data.description ?? 'No Data'
                         });
                       } else {
-                        reference.child("anime").child(data.id!).remove();
+                        reference.child("anime").child(data.id).remove();
                       }
                     },
                     borderRadius: const BorderRadius.all(Radius.circular(8)),
@@ -141,7 +138,7 @@ class _AnimeDetails extends State<AnimeDetails> {
                       ),
                     ),
                     Text(
-                      data.attributes?.description ?? "No Data",
+                      data.description ?? "No Data",
                       style: const TextStyle(
                         fontWeight: FontWeight.normal,
                       ),
